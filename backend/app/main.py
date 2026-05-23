@@ -306,6 +306,7 @@ async def get_session_sources(
                 "id": s.id,
                 "title": s.title,
                 "url": s.url,
+                "content": s.content,
                 "source_type": s.source_type,
                 "trust_score": s.trust_score,
                 "relevance_score": s.relevance_score,

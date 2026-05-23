@@ -90,10 +90,22 @@ class ResearchOrchestrator:
         # 4. Spawning parallel retrievers
         retrieved_items = []
         
-        # Build search variants string
-        search_query = analysis.get("search_variants", [query])[0]
+        # Build search variants list, including user original query
+        search_variants = analysis.get("search_variants", [])
+        if not isinstance(search_variants, list):
+            search_variants = [search_variants]
+            
+        if query not in search_variants:
+            search_variants.insert(0, query)
+            
+        unique_variants = []
+        for v in search_variants:
+            if v and v.strip() and v.strip().lower() not in [x.lower() for x in unique_variants]:
+                unique_variants.append(v.strip())
+        unique_variants = unique_variants[:3] # Cap to top 3 unique search queries
+        
         retrieval_task = asyncio.create_task(
-            self.retrieval_engine.execute_retrieval(search_query, [s for s in active_sources if s != "upload"], session_id)
+            self.retrieval_engine.execute_retrieval(unique_variants, [s for s in active_sources if s != "upload"], session_id)
         )
 
         # Check and process uploaded document buffers in parallel
@@ -110,7 +122,14 @@ class ResearchOrchestrator:
                     session_id,
                     "source_discovered",
                     f"Parsed PDF upload: {name}",
-                    metadata={"title": name, "source_type": "upload"}
+                    metadata={
+                        "title": name, 
+                        "url": "local-upload", 
+                        "content": chunks[0].get("content")[:500] if chunks else "",
+                        "source_type": "upload",
+                        "trust_score": 1.0,
+                        "relevance_score": 1.0
+                    }
                 )
 
         # Wait for crawler arrays
@@ -126,7 +145,14 @@ class ResearchOrchestrator:
                 session_id,
                 "source_discovered",
                 f"Source Crawled [{src_type}]: {title[:60]}...",
-                metadata={"title": title, "url": item.get("url"), "source_type": item.get("source_type")}
+                metadata={
+                    "title": title, 
+                    "url": item.get("url"), 
+                    "content": item.get("content"),
+                    "source_type": item.get("source_type"),
+                    "trust_score": item.get("trust_score", 0.70),
+                    "relevance_score": item.get("relevance_score", 0.70)
+                }
             )
             await asyncio.sleep(0.05)
 
