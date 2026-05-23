@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>SourceLens AI - OSINT Intelligence Desk</title>
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <!-- Google Fonts: Space Grotesk, Geist, JetBrains Mono, Caveat -->
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&amp;family=Geist:wght@100..900&amp;family=JetBrains+Mono:wght@100..800&amp;family=Space+Grotesk:wght@300..700&amp;display=swap" rel="stylesheet"/>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#75d1ff",
+                        "on-tertiary": "#00363f",
+                        "on-error": "#690005",
+                        "error-container": "#93000a",
+                        "inverse-surface": "#e0e3e6",
+                        "tertiary-container": "#44c4db",
+                        "error": "#ffb4ab",
+                        "on-primary-container": "#004c66",
+                        "on-primary-fixed-variant": "#004d67",
+                        "outline": "#86929a",
+                        "on-surface": "#e0e3e6",
+                        "primary-container": "#00c2ff",
+                        "surface-tint": "#75d1ff",
+                        "on-secondary-fixed-variant": "#005141",
+                        "surface-dim": "#101416",
+                        "surface-bright": "#363a3c",
+                        "on-primary-fixed": "#001e2b",
+                        "surface-container-high": "#272a2d",
+                        "on-primary": "#003548",
+                        "inverse-primary": "#006688",
+                        "on-tertiary-fixed-variant": "#004e5a",
+                        "on-tertiary-fixed": "#001f25",
+                        "on-tertiary-container": "#004e59",
+                        "outline-variant": "#3d484f",
+                        "surface-container": "#1d2022",
+                        "tertiary": "#66e0f8",
+                        "surface-container-highest": "#323538",
+                        "secondary-fixed": "#70f9d6",
+                        "primary": "#92d9ff",
+                        "on-background": "#e0e3e6",
+                        "on-secondary-fixed": "#002019",
+                        "surface-variant": "#323538",
+                        "on-error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#4fddba",
+                        "inverse-on-surface": "#2d3133",
+                        "secondary-container": "#03b595",
+                        "surface-container-low": "#191c1e",
+                        "on-secondary-container": "#003f33",
+                        "secondary": "#4fddba",
+                        "on-surface-variant": "#bcc8d1",
+                        "tertiary-fixed": "#a3eeff",
+                        "surface-container-lowest": "#0b0f11",
+                        "tertiary-fixed-dim": "#5bd6ee",
+                        "background": "#101416",
+                        "on-secondary": "#00382c",
+                        "primary-fixed": "#c2e8ff",
+                        "surface": "#101416",
+                        "alert-conflicts": "#FFB86B"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "margin-desktop": "48px",
+                        "unit": "4px",
+                        "panel-gap": "1px"
+                    },
+                    "fontFamily": {
+                        "display-xl": ["Space Grotesk", "sans-serif"],
+                        "meta-sm": ["Geist", "sans-serif"],
+                        "headline-lg": ["Space Grotesk", "sans-serif"],
+                        "headline-md": ["Space Grotesk", "sans-serif"],
+                        "body-lg": ["Geist", "sans-serif"],
+                        "label-mono": ["JetBrains Mono", "monospace"],
+                        "headline-lg-mobile": ["Space Grotesk", "sans-serif"],
+                        "body-md": ["Geist", "sans-serif"],
+                        "handwriting": ["Caveat", "cursive"]
+                    },
+                    "fontSize": {
+                        "display-xl": ["72px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700" }],
+                        "meta-sm": ["13px", { "lineHeight": "1.4", "fontWeight": "500" }],
+                        "headline-lg": ["40px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-mono": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .filled-icon { font-variation-settings: 'FILL' 1; }
+        
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        .cursor-blink { animation: blink 1s step-end infinite; }
+        
+        @keyframes pulse-light { 0%, 100% { opacity: 0.8; } 50% { opacity: 0.4; } }
+        .text-pulse { animation: pulse-light 2s ease-in-out infinite; }
+        
+        /* The Lit Study: Warm dark felt background */
+        .bg-desk {
+            background-color: #161210;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(255,140,50,0.04) 0%, transparent 60%),
+                repeating-linear-gradient(45deg, rgba(0,0,0,0.15) 0, rgba(0,0,0,0.15) 2px, transparent 2px, transparent 4px);
+        }
+        
+        /* Vignette overlay for focus */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(8, 4, 2, 0.75) 100%);
+            z-index: 100;
+        }
+        
+        .highlighter {
+            background: linear-gradient(104deg, transparent 0%, rgba(255, 215, 0, 0.25) 2%, rgba(255, 215, 0, 0.35) 98%, transparent 100%);
+            border-radius: 2px 8px 8px 2px;
+            padding: 0 4px;
+            margin: 0 -4px;
+            color: #fffae6;
+        }
+
+        /* Paper aesthetic for cards and canvas */
+        .paper-card {
+            background: linear-gradient(135deg, #25201d 0%, #1c1715 100%);
+            box-shadow: 4px 8px 24px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.03);
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        /* Pin decoration */
+        .pin::before {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #ff5252, #a61b1b);
+            box-shadow: 1px 2px 3px rgba(0,0,0,0.6), inset -1px -1px 2px rgba(0,0,0,0.4);
+            z-index: 10;
+        }
+
+        .sticky-note {
+            background: linear-gradient(135deg, #523a1f 0%, #402c17 100%);
+            box-shadow: 2px 6px 12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+            position: relative;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #3d342f; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #5c4f47; }
+        
+        .scribble-font {
+            font-family: 'Caveat', cursive;
+            font-size: 1.25rem;
+            color: #ff9e7d;
+            transform: rotate(-2deg);
+        }
+        
+        /* Coffee stain */
+        .coffee-stain {
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 3px solid rgba(80, 50, 30, 0.08);
+            background: radial-gradient(circle, transparent 60%, rgba(80, 50, 30, 0.04) 100%);
+            pointer-events: none;
+            mix-blend-mode: multiply;
+        }
+        
+        /* Glowing highlight on active elements */
+        .neon-glow {
+            border-color: #ffcc66 !important;
+            box-shadow: 0 0 25px rgba(255, 204, 102, 0.4), inset 0 1px 1px rgba(255,255,255,0.1) !important;
+            transform: scale(1.03) translateY(-4px) !important;
+            z-index: 50 !important;
+        }
+
+        /* High-fidelity Print & PDF styling */
+        @media print {
+            body, main, #paper-canvas {
+                background: #ffffff !important;
+                color: #111111 !important;
+            }
+            aside, header, nav, #system-status-indicator, #orion-status-msg, #upload-status-pill, .absolute.bottom-8, #toggle-workbench-btn, #export-md-btn, #export-pdf-btn, svg, .ml-20 {
+                display: none !important;
+            }
+            .ml-20, main {
+                margin-left: 0 !important;
+                padding: 0 !important;
+            }
+            #paper-canvas {
+                box-shadow: none !important;
+                border: none !important;
+                transform: none !important;
+                max-w-none !important;
+                width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .coffee-stain, .pin::before {
+                display: none !important;
+            }
+            h1, h2, h3, p, div, li, span {
+                color: #111111 !important;
+            }
+            /* Style followups nicely in print */
+            .followup-answer {
+                background: #f9f9f9 !important;
+                border: 1px solid #dddddd !important;
+                color: #222222 !important;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body class="bg-desk text-on-surface h-screen w-screen overflow-hidden flex font-body-md selection:bg-yellow-500/30 selection:text-[#ece0d1] relative">
+    
+    <!-- Connection String SVG -->
+    <svg id="svg-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-20 opacity-30">
+        <!-- SVG lines drawn dynamically between canvas and workbench cards -->
+    </svg>
+
+    <!-- Navigation -->
+    <nav class="fixed left-0 top-0 h-full w-20 hover:w-64 transition-all duration-300 z-40 flex flex-col pt-16 bg-[#181412]/95 backdrop-blur-md border-r border-[#332a26] group overflow-hidden shadow-2xl">
+        <div class="px-4 pb-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300 w-64 flex-shrink-0">
+            <h1 class="font-display-xl text-[#f0d0a8] text-xl truncate tracking-tight">SourceLens AI</h1>
+            <p class="font-label-mono text-label-mono text-[#a08f85] truncate mt-1">RESEARCH_PARTNER</p>
+        </div>
+        <button id="new-workspace-btn" class="mx-4 mb-8 py-3 bg-[#e0aa6c]/10 text-[#e0aa6c] border border-[#e0aa6c]/30 font-label-mono text-label-mono font-bold uppercase rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 flex-shrink-0 hover:bg-[#e0aa6c]/20 hover:text-[#ffdbad] shadow-sm">
+            NEW_WORKSPACE
+        </button>
+        <div class="flex-1 overflow-y-auto w-full">
+            <ul class="flex flex-col gap-2 w-full px-2">
+                <li class="w-full">
+                    <a class="flex items-center text-[#e0aa6c] border border-[#e0aa6c]/20 rounded-lg pl-3 py-3 bg-[#e0aa6c]/10 hover:bg-[#e0aa6c]/20 transition-all duration-200 w-[240px]" href="#">
+                        <span class="material-symbols-outlined filled-icon flex-shrink-0 mr-4">edit_document</span>
+                        <span class="font-label-mono text-label-mono opacity-0 group-hover:opacity-100 transition-opacity duration-300">Active Canvas</span>
+                    </a>
+                </li>
+                <li class="w-full mt-4">
+                    <div class="px-3 py-1 text-[10px] font-label-mono text-[#a08f85] tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        History
+                    </div>
+                    <ul id="history-list" class="flex flex-col gap-1 w-full mt-1">
+                        <!-- History loaded dynamically -->
+                        <li class="px-3 py-2 text-meta-sm text-[#a08f85] italic opacity-0 group-hover:opacity-100 transition-opacity duration-300">No sessions yet</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Workspace Area -->
+    <main class="ml-20 flex-1 flex flex-col h-full relative overflow-hidden transition-all duration-300">
+        <!-- Header -->
+        <header class="h-16 flex justify-between items-center px-8 py-3 border-b border-[#332a26]/50 bg-[#181412]/50 backdrop-blur-xl shrink-0 z-30 shadow-sm">
+            <div class="flex items-center gap-4">
+                <span class="font-headline-md text-headline-md font-semibold text-[#f0d0a8] tracking-tighter drop-shadow-md">SourceLens AI</span>
+                <span id="system-status-indicator" class="px-2 py-1 bg-[#231b18] rounded-md text-meta-sm font-label-mono text-[#a08f85] ml-4 border border-[#332a26]/80">STANDBY</span>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <!-- Collapsible Sidebar Toggle Button -->
+                <button id="toggle-workbench-btn" onclick="toggleWorkbench()" class="flex items-center gap-1.5 px-3 py-1.5 bg-[#231b18] hover:bg-[#2e231f] border border-[#332a26] rounded text-meta-sm font-label-mono text-[#a08f85] transition-all hover:text-[#ece0d1] hover:border-[#ffaa44]/40" title="Toggle Research Workbench Sidebar">
+                    <span class="material-symbols-outlined text-sm">side_navigation</span> Hide Sidebar
+                </button>
+
+                <!-- Glowing ORION Lamp Companion in Header -->
+                <div class="flex items-center gap-3 bg-[#2d1b0f] border border-[#ffaa44]/30 rounded-full px-4 py-1.5 shadow-[0_0_15px_rgba(255,170,68,0.15)] max-w-sm truncate">
+                    <div class="w-6 h-6 rounded-full bg-[#ffb86b] flex items-center justify-center animate-pulse shadow-[0_0_10px_rgba(255,184,107,0.5)] flex-shrink-0">
+                        <span class="material-symbols-outlined text-[#2d1b0f] text-[14px] filled-icon">lightbulb</span>
+                    </div>
+                    <span id="orion-status-msg" class="font-label-mono text-label-mono text-[#ffcc66] truncate">ORION is waiting for research input...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dynamic Scattered Layout -->
+        <div class="flex-1 flex overflow-hidden">
+            
+            <!-- Center Research Canvas -->
+            <div id="canvas-container" class="flex-grow w-3/5 px-8 lg:px-12 py-12 overflow-y-auto relative pb-32 flex justify-center items-start transition-all duration-300">
+                
+                <!-- Main Paper Canvas -->
+                <div id="paper-canvas" class="paper-card pin w-full max-w-3xl p-12 rounded-sm transform rotate-[0.5deg] border border-[#332a26]">
+                    <div class="coffee-stain top-10 right-20 opacity-20"></div>
+                    <div class="coffee-stain bottom-40 left-10 opacity-15 scale-75"></div>
+                    
+                    <header class="mb-10 relative z-10">
+                        <div class="absolute -left-16 top-4 text-[#ff9e7d]/80 scribble-font text-lg rotate-[-15deg]">intelligence canvas</div>
+                        <div class="flex justify-between items-center mb-4">
+                            <div id="session-id-tag" class="font-label-mono text-label-mono text-[#a08f85] flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-[#3d332e] text-pulse"></span>
+                                SESSION: STANDBY
+                            </div>
+                            <div class="flex gap-2 relative z-30">
+                                <button id="export-md-btn" onclick="exportMarkdown()" class="hidden px-2.5 py-1.5 bg-[#231b18] hover:bg-[#332a26] border border-[#ffaa44]/20 hover:border-[#ffaa44]/50 text-[#ffcc66] hover:text-[#ece0d1] rounded text-[10px] font-label-mono uppercase tracking-wider transition-all duration-200 flex items-center gap-1.5 shadow-sm">
+                                    <span class="material-symbols-outlined text-[13px]">download</span> Export MD
+                                </button>
+                                <button id="export-pdf-btn" onclick="window.print()" class="hidden px-2.5 py-1.5 bg-[#231b18] hover:bg-[#332a26] border border-[#ffaa44]/20 hover:border-[#ffaa44]/50 text-[#ffcc66] hover:text-[#ece0d1] rounded text-[10px] font-label-mono uppercase tracking-wider transition-all duration-200 flex items-center gap-1.5 shadow-sm">
+                                    <span class="material-symbols-outlined text-[13px]">picture_as_pdf</span> Print / PDF
+                                </button>
+                            </div>
+                        </div>
+                        <h1 id="canvas-title" class="font-headline-lg text-headline-lg text-[#ece0d1] leading-tight">No Active Workspace</h1>
+                    </header>
+                    
+                    <!-- Dynamic synthesized content blocks -->
+                    <article id="canvas-content" class="space-y-10 relative z-10">
+                        
+                        <!-- Standby View when first loaded -->
+                        <div id="canvas-standby" class="py-16 text-center space-y-6">
+                            <div class="w-16 h-16 rounded-full border-2 border-dashed border-[#5c4a40] flex items-center justify-center mx-auto text-[#a08f85]">
+                                <span class="material-symbols-outlined text-3xl">terminal</span>
+                            </div>
+                            <div class="max-w-md mx-auto">
+                                <h3 class="font-headline-md text-lg text-[#ece0d1]">Initiate Research Session</h3>
+                                <p class="text-meta-sm text-[#a08f85] mt-2 leading-relaxed">
+                                    Submit a query or drop PDF logs below. The pipeline will parse intent, execute concurrent retrievers (arXiv, Tavily, Wikipedia, GitHub), filter semantic overlaps, run contradiction analysis, and build a premium grounded report.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- 1. Summary Block -->
+                        <section id="summary-section" class="group relative hidden">
+                            <h2 class="font-label-mono text-label-mono text-[#a08f85] mb-4 uppercase tracking-widest flex items-center gap-2 border-b border-[#332a26] pb-2">
+                                <span class="material-symbols-outlined text-sm">segment</span> Summary
+                            </h2>
+                            <div id="summary-block" class="font-body-lg text-body-lg text-[#d4c3b3] text-opacity-95 leading-relaxed relative">
+                                <!-- Streamed summary text goes here -->
+                            </div>
+                        </section>
+
+                        <!-- 2. Findings Block -->
+                        <section id="findings-section" class="group relative hidden">
+                            <h2 class="font-label-mono text-label-mono text-[#a08f85] mb-4 uppercase tracking-widest flex items-center gap-2 border-b border-[#332a26] pb-2">
+                                <span class="material-symbols-outlined text-sm">check_circle</span> Key Findings
+                            </h2>
+                            <ul id="findings-block" class="space-y-4 font-body-lg text-body-lg text-[#d4c3b3] text-opacity-90">
+                                <!-- Bullet list of findings -->
+                            </ul>
+                        </section>
+
+                        <!-- 3. Perspectives Block -->
+                        <section id="perspectives-section" class="group relative hidden">
+                            <h2 class="font-label-mono text-label-mono text-[#a08f85] mb-4 uppercase tracking-widest flex items-center gap-2 border-b border-[#332a26] pb-2">
+                                <span class="material-symbols-outlined text-sm">explore</span> Perspectives & Contexts
+                            </h2>
+                            <ul id="perspectives-block" class="space-y-3 font-body-md text-body-md text-[#d4c3b3] text-opacity-80">
+                                <!-- Perspectives list -->
+                            </ul>
+                        </section>
+
+                        <!-- 4. Contradiction Yellow Sticky Note -->
+                        <section id="contradictions-section" class="relative hidden">
+                            <div class="sticky-note pin p-6 rounded-sm transform rotate-[-2deg] max-w-2xl mx-auto border border-[#8a5d3b]/40">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-[#ffb86b]">warning</span>
+                                        <h2 class="font-label-mono text-label-mono text-[#ffb86b] uppercase tracking-widest drop-shadow-sm">Contradictions Detected</h2>
+                                    </div>
+                                </div>
+                                <div id="contradictions-block" class="font-body-md text-body-md text-[#ece0d1]/90 leading-relaxed scribble-font text-xl">
+                                    <!-- Dynamic contradictions details -->
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- 5. Limitations Block -->
+                        <section id="limitations-section" class="group relative hidden">
+                            <h2 class="font-label-mono text-label-mono text-[#a08f85] mb-4 uppercase tracking-widest flex items-center gap-2 border-b border-[#332a26] pb-2">
+                                <span class="material-symbols-outlined text-sm">history_toggle_off</span> Limitations & Evidence Gaps
+                            </h2>
+                            <ul id="limitations-block" class="space-y-2 font-body-md text-body-md text-[#d4c3b3] text-opacity-85 list-disc pl-5">
+                                <!-- Limitations items -->
+                            </ul>
+                        </section>
+
+                        <!-- 6. Conclusions Block -->
+                        <section id="conclusions-section" class="group relative hidden">
+                            <h2 class="font-label-mono text-label-mono text-[#a08f85] mb-4 uppercase tracking-widest flex items-center gap-2 border-b border-[#332a26] pb-2">
+                                <span class="material-symbols-outlined text-sm">inventory_2</span> Conclusions & Mitigations
+                            </h2>
+                            <ul id="conclusions-block" class="space-y-3 font-body-md text-body-md text-[#d4c3b3] text-opacity-90">
+                                <!-- Conclusions bullet list -->
+                            </ul>
+                        </section>
+                        
+                        <!-- 7. Follow-up Chat Panel -->
+                        <section id="followup-section" class="group relative hidden border-t border-[#332a26]/80 pt-8 mt-12 relative z-10">
+                            <h2 class="font-label-mono text-label-mono text-[#ffaa44] mb-4 uppercase tracking-widest flex items-center gap-2">
+                                <span class="material-symbols-outlined text-sm text-[#ffaa44]">forum</span> Grounded Follow-up Chat
+                            </h2>
+                            <div id="followup-messages" class="space-y-4 max-h-[350px] overflow-y-auto pr-2 mb-6 scrollbar-thin">
+                                <!-- Dynamic follow-up messages go here -->
+                            </div>
+                            
+                            <!-- Follow-up input row -->
+                            <div class="flex gap-3 bg-[#181412]/80 border border-[#ffaa44]/20 rounded p-2 focus-within:border-[#ffaa44]/80 transition-colors">
+                                <input id="followup-input" type="text" onkeydown="if(event.key==='Enter') triggerFollowup()" class="flex-grow bg-transparent border-none text-[#ece0d1] font-body-md focus:ring-0 placeholder-[#a08f85]/50 outline-none pl-2 text-sm" placeholder="Ask follow-up questions grounded in these sources..."/>
+                                <button id="followup-send-btn" onclick="triggerFollowup()" class="px-4 py-2 bg-[#ffaa44]/20 hover:bg-[#ffaa44]/35 text-[#ffcc66] border border-[#ffaa44]/30 rounded text-xs font-label-mono uppercase tracking-wider transition-colors flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-xs">send</span> Send
+                                </button>
+                            </div>
+                        </section>
+                        
+                    </article>
+                </div>
+            </div>
+
+            <!-- Right Research Workbench -->
+            <aside id="workbench-aside" class="w-2/5 border-l border-[#332a26]/50 flex flex-col z-20 relative overflow-hidden shadow-[-10px_0_30px_rgba(0,0,0,0.6)] transition-all duration-300">
+                <div class="p-4 border-b border-[#332a26]/50 flex justify-between items-center bg-[#181412]/80 backdrop-blur z-30">
+                    <span class="font-label-mono text-label-mono text-[#d4c3b3] tracking-wider flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm text-[#e0aa6c]">dashboard_customize</span> RESEARCH WORKBENCH
+                    </span>
+                    <div class="flex gap-2 text-meta-sm text-[#a08f85] font-label-mono" id="citations-count">
+                        0 SOURCES INDEXED
+                    </div>
+                </div>
+                
+                <div class="flex-1 overflow-y-auto p-8 relative z-10 bg-[#161210]/40">
+                    <!-- Dynamic overlapping cards simulating paper scraps pinned to a board -->
+                    <div id="workbench-container" class="relative w-full min-h-[600px] flex flex-col gap-6">
+                        
+                        <!-- Empty Workbench Placeholder -->
+                        <div id="workbench-empty" class="absolute inset-0 flex flex-col items-center justify-center text-center p-8 opacity-40">
+                            <span class="material-symbols-outlined text-4xl mb-3 text-[#a08f85]">layers_clear</span>
+                            <p class="font-label-mono text-xs text-[#a08f85]">NO PIPELINE ARTIFACTS PINNED</p>
+                        </div>
+                        
+                    </div>
+                </div>
+            </aside>
+            
+        </div>
+
+        <!-- Bottom Collaborative Input (ORION Lens Input) -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 w-full max-w-3xl px-4 z-40">
+            
+            <div id="upload-status-pill" class="mb-2 hidden flex items-center justify-between bg-[#2d1b0f] border border-[#ffaa44]/30 rounded px-4 py-1.5 text-xs text-[#ffcc66]">
+                <span class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm text-[#ffaa44] animate-spin">sync</span>
+                    <span id="upload-status-text">Uploading and caching doc.pdf...</span>
+                </span>
+                <button id="clear-upload-btn" class="text-meta-sm text-[#a08f85] hover:text-[#f0d0a8]">&times; Clear</button>
+            </div>
+            
+            <div class="bg-[#181412]/95 backdrop-blur-xl border border-[#ffaa44]/40 rounded-sm p-2 pl-4 flex items-center shadow-[0_10px_40px_rgba(255,170,68,0.12)] transition-all focus-within:shadow-[0_10px_40px_rgba(255,170,68,0.25)] focus-within:border-[#ffaa44]">
+                <div class="w-8 h-8 rounded-full bg-[#ffcc66]/20 flex items-center justify-center mr-2 shadow-[0_0_10px_rgba(255,204,102,0.3)]">
+                    <span class="material-symbols-outlined text-[#ffcc66] text-sm animate-pulse">lightbulb</span>
+                </div>
+                
+                <input id="search-input" class="flex-1 bg-transparent border-none text-[#ece0d1] font-body-md focus:ring-0 placeholder-[#a08f85]/60 outline-none" placeholder="Add topics for research..." type="text" value=""/>
+                
+                <div class="flex gap-2">
+                    <button id="attach-btn" class="w-10 h-10 rounded-sm hover:bg-[#28211e] text-[#a08f85] flex items-center justify-center transition-colors border border-transparent hover:border-[#3d332e]" title="Attach Primary PDF Documents">
+                        <span class="material-symbols-outlined">attach_file</span>
+                    </button>
+                    <button id="search-btn" class="w-10 h-10 rounded-sm bg-[#ffaa44]/20 text-[#ffcc66] border border-[#ffaa44]/40 flex items-center justify-center hover:bg-[#ffaa44]/35 transition-colors shadow-sm" title="Launch Research Pipeline">
+                        <span class="material-symbols-outlined filled-icon text-sm">arrow_upward</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Hidden File Input for PDF uploads -->
+    <input type="file" id="file-selector" class="hidden" accept=".pdf"/>
+
+    <!-- Dynamic JavaScript -->
+    <script>
+        // Server URL configuration
+        const API_BASE = window.location.origin;
+
+        // Session State variables
+        let currentSessionId = "";
+        let eventSource = null;
+        let isResearching = false;
+        let pendingFile = null;
+        let citationSourceMap = {};
+        let isHandlingFollowup = false;
+
+        // Generate dynamic ID
+        function generateId(prefix = "sess") {
+            return `${prefix}_${Math.random().toString(36).substr(2, 8)}`;
+        }
+
+        // On Load
+        document.addEventListener("DOMContentLoaded", () => {
+            currentSessionId = generateId();
+            document.getElementById("session-id-tag").innerHTML = `<span class="w-2 h-2 rounded-full bg-green-500 text-pulse"></span> SESSION: ${currentSessionId}`;
+            
+            // Load history
+            loadHistory();
+
+            // Set listeners
+            document.getElementById("search-btn").addEventListener("click", triggerResearch);
+            document.getElementById("search-input").addEventListener("keypress", (e) => {
+                if (e.key === "Enter") triggerResearch();
+            });
+            document.getElementById("new-workspace-btn").addEventListener("click", resetWorkspace);
+            
+            document.getElementById("attach-btn").addEventListener("click", () => {
+                document.getElementById("file-selector").click();
+            });
+            
+            document.getElementById("file-selector").addEventListener("change", handleFileSelection);
+            document.getElementById("clear-upload-btn").addEventListener("click", clearUpload);
+        });
+
+        // Load Past Sessions List
+        async function loadHistory() {
+            try {
+                const response = await fetch(`${API_BASE}/history`);
+                const data = await response.json();
+                const list = document.getElementById("history-list");
+                list.innerHTML = "";
+                
+                if (data.sessions && data.sessions.length > 0) {
+                    data.sessions.forEach(sess => {
+                        const li = document.createElement("li");
+                        li.className = "w-full";
+                        li.innerHTML = `
+                            <button onclick="restoreSession('${sess.id}', '${sess.title.replace(/'/g, "\\'")}')" class="text-left w-full pl-3 py-2 text-meta-sm text-[#a08f85] hover:bg-[#231b18] hover:text-[#ece0d1] rounded-sm truncate font-label-mono block opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                &gt; ${sess.id}
+                            </button>
+                        `;
+                        list.appendChild(li);
+                    });
+                } else {
+                    list.innerHTML = `<li class="px-3 py-2 text-meta-sm text-[#a08f85] italic opacity-0 group-hover:opacity-100 transition-opacity duration-300">No sessions yet</li>`;
+                }
+            } catch (e) {
+                console.error("Failed to load history:", e);
+            }
+        }
+
+        // Restore past session
+        async function restoreSession(sessId, title) {
+            resetWorkspaceState();
+            currentSessionId = sessId;
+            document.getElementById("session-id-tag").innerHTML = `<span class="w-2 h-2 rounded-full bg-green-500"></span> SESSION: ${currentSessionId}`;
+            document.getElementById("canvas-title").innerText = title;
+            document.getElementById("canvas-standby").classList.add("hidden");
+            
+            // Show status
+            document.getElementById("system-status-indicator").innerText = "RESTORED";
+            document.getElementById("orion-status-msg").innerText = `Restored session ${sessId}. Loading components...`;
+
+            try {
+                // Get report
+                const rResp = await fetch(`${API_BASE}/research/${sessId}`);
+                if (rResp.ok) {
+                    const rData = await rResp.json();
+                    if (rData.reports && rData.reports.length > 0) {
+                        const rep = rData.reports[0];
+                        renderReportData(rep);
+                    }
+                }
+
+                // Get sources
+                const sResp = await fetch(`${API_BASE}/sources/${sessId}`);
+                if (sResp.ok) {
+                    const sData = await sResp.json();
+                    if (sData.sources) {
+                        document.getElementById("workbench-empty").classList.add("hidden");
+                        sData.sources.forEach((src, index) => {
+                            appendSourceCard(src, index + 1);
+                        });
+                        document.getElementById("citations-count").innerText = `${sData.sources.length} SOURCES INDEXED`;
+                    }
+                }
+                
+                // Build hovering highlights
+                registerCitationsHighlighting();
+                
+            } catch (e) {
+                console.error("Restoring session error:", e);
+            }
+        }
+
+        // Clean UI Workspace state
+        function resetWorkspaceState() {
+            if (eventSource) {
+                eventSource.close();
+                eventSource = null;
+            }
+            isResearching = false;
+            
+            // Hide and clear export and followup items
+            document.getElementById("export-md-btn").classList.add("hidden");
+            document.getElementById("export-pdf-btn").classList.add("hidden");
+            document.getElementById("followup-section").classList.add("hidden");
+            document.getElementById("followup-messages").innerHTML = "";
+            document.getElementById("followup-input").value = "";
+            document.getElementById("followup-input").disabled = false;
+            document.getElementById("followup-send-btn").disabled = false;
+            
+            // Clear content sections
+            document.getElementById("summary-section").classList.add("hidden");
+            document.getElementById("findings-section").classList.add("hidden");
+            document.getElementById("perspectives-section").classList.add("hidden");
+            document.getElementById("contradictions-section").classList.add("hidden");
+            document.getElementById("limitations-section").classList.add("hidden");
+            document.getElementById("conclusions-section").classList.add("hidden");
+            
+            document.getElementById("summary-block").innerHTML = "";
+            document.getElementById("findings-block").innerHTML = "";
+            document.getElementById("perspectives-block").innerHTML = "";
+            document.getElementById("contradictions-block").innerHTML = "";
+            document.getElementById("limitations-block").innerHTML = "";
+            document.getElementById("conclusions-block").innerHTML = "";
+
+            // Reset workbench
+            const workbench = document.getElementById("workbench-container");
+            workbench.innerHTML = `
+                <div id="workbench-empty" class="absolute inset-0 flex flex-col items-center justify-center text-center p-8 opacity-40">
+                    <span class="material-symbols-outlined text-4xl mb-3 text-[#a08f85]">layers_clear</span>
+                    <p class="font-label-mono text-xs text-[#a08f85]">NO PIPELINE ARTIFACTS PINNED</p>
+                </div>
+            `;
+            document.getElementById("citations-count").innerText = "0 SOURCES INDEXED";
+            citationSourceMap = {};
+        }
+
+        function resetWorkspace() {
+            resetWorkspaceState();
+            currentSessionId = generateId();
+            document.getElementById("session-id-tag").innerHTML = `<span class="w-2 h-2 rounded-full bg-green-500 text-pulse"></span> SESSION: ${currentSessionId}`;
+            document.getElementById("canvas-title").innerText = "New Intelligent Workspace";
+            document.getElementById("canvas-standby").classList.remove("hidden");
+            document.getElementById("system-status-indicator").innerText = "STANDBY";
+            document.getElementById("orion-status-msg").innerText = "ORION is waiting for research input...";
+            clearUpload();
+        }
+
+        // Render whole report directly (useful for session restore)
+        function renderReportData(rep) {
+            document.getElementById("canvas-standby").classList.add("hidden");
+            
+            // Show Export buttons and Follow-up panel
+            document.getElementById("export-md-btn").classList.remove("hidden");
+            document.getElementById("export-pdf-btn").classList.remove("hidden");
+            document.getElementById("followup-section").classList.remove("hidden");
+            
+            // Summary
+            if (rep.summary) {
+                document.getElementById("summary-section").classList.remove("hidden");
+                document.getElementById("summary-block").innerText = rep.summary;
+            }
+            
+            // Findings
+            if (rep.findings && rep.findings.length > 0) {
+                document.getElementById("findings-section").classList.remove("hidden");
+                const block = document.getElementById("findings-block");
+                block.innerHTML = "";
+                rep.findings.forEach(f => {
+                    const li = document.createElement("li");
+                    li.className = "flex items-start gap-3 bg-[#1e1917]/50 p-4 rounded-md border border-[#332a26] shadow-sm mt-3";
+                    li.innerHTML = `
+                        <span class="material-symbols-outlined text-[#e0aa6c] mt-1 text-xl">auto_awesome</span>
+                        <div>${f}</div>
+                    `;
+                    block.appendChild(li);
+                });
+            }
+            
+            // Perspectives
+            if (rep.perspectives && rep.perspectives.length > 0) {
+                document.getElementById("perspectives-section").classList.remove("hidden");
+                const block = document.getElementById("perspectives-block");
+                block.innerHTML = "";
+                rep.perspectives.forEach(p => {
+                    const li = document.createElement("li");
+                    li.className = "bg-[#181311]/30 p-3 border-l-2 border-[#e0aa6c] pl-4";
+                    li.innerText = p;
+                    block.appendChild(li);
+                });
+            }
+            
+            // Contradictions Note
+            if (rep.contradictions && rep.contradictions.length > 0 && rep.contradictions[0] !== "") {
+                document.getElementById("contradictions-section").classList.remove("hidden");
+                document.getElementById("contradictions-block").innerText = rep.contradictions.join("\n\n");
+            }
+            
+            // Limitations
+            if (rep.limitations && rep.limitations.length > 0 && rep.limitations[0] !== "") {
+                document.getElementById("limitations-section").classList.remove("hidden");
+                const block = document.getElementById("limitations-block");
+                block.innerHTML = "";
+                rep.limitations.forEach(l => {
+                    const li = document.createElement("li");
+                    li.innerText = l;
+                    block.appendChild(li);
+                });
+            }
+            
+            // Conclusions
+            if (rep.conclusions && rep.conclusions.length > 0) {
+                document.getElementById("conclusions-section").classList.remove("hidden");
+                const block = document.getElementById("conclusions-block");
+                block.innerHTML = "";
+                rep.conclusions.forEach(c => {
+                    const li = document.createElement("li");
+                    li.className = "flex items-start gap-3 bg-[#231b18]/40 p-4 border border-[#332a26] rounded-sm";
+                    li.innerHTML = `
+                        <span class="material-symbols-outlined text-[#e0aa6c] text-[18px] mt-0.5">check_box</span>
+                        <div>${c}</div>
+                    `;
+                    block.appendChild(li);
+                });
+            }
+        }
+
+        // Handle uploader selections
+        function handleFileSelection(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (file.type !== "application/pdf") {
+                alert("Only PDF documents are supported currently.");
+                return;
+            }
+            
+            pendingFile = file;
+            
+            // Show status pill
+            const statusPill = document.getElementById("upload-status-pill");
+            statusPill.classList.remove("hidden");
+            document.getElementById("upload-status-text").innerText = `PDF file selected: ${file.name} (Wait for Trigger to upload & index)`;
+        }
+
+        function clearUpload() {
+            pendingFile = null;
+            document.getElementById("file-selector").value = "";
+            document.getElementById("upload-status-pill").classList.add("hidden");
+        }
+
+        // POST file upload
+        async function uploadPendingPDF(sessId) {
+            if (!pendingFile) return true;
+            
+            document.getElementById("upload-status-text").innerText = `Uploading and caching ${pendingFile.name}...`;
+            
+            const formData = new FormData();
+            formData.append("session_id", sessId);
+            formData.append("file", pendingFile);
+            
+            try {
+                const response = await fetch(`${API_BASE}/upload`, {
+                    method: "POST",
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    // Pre-render handwritten note about uploaded pdf pinned to workspace
+                    document.getElementById("workbench-empty").classList.add("hidden");
+                    const workbench = document.getElementById("workbench-container");
+                    
+                    const note = document.createElement("div");
+                    note.className = "absolute top-48 left-8 w-64 bg-[#e6d5c3] text-[#332211] border border-[#c4b5a3] rounded-sm p-4 shadow-lg transform rotate-[-6deg] hover:z-30 hover:rotate-[-4deg] transition-transform z-10";
+                    note.innerHTML = `
+                        <div class="pin absolute top-2 left-1/2"></div>
+                        <div class="flex items-center gap-2 mb-2 text-[#8c4b31]">
+                            <span class="material-symbols-outlined text-sm">edit</span>
+                            <span class="font-label-mono text-xs font-bold">Workspace Pinned</span>
+                        </div>
+                        <p class="font-body-md text-lg text-[#332211] scribble-font leading-tight">
+                            Primary Document ${pendingFile.name} parsed & cached in session coordinates. Parallel chunks indexed!
+                        </p>
+                    `;
+                    workbench.appendChild(note);
+                    
+                    clearUpload();
+                    return true;
+                } else {
+                    const err = await response.json();
+                    alert(`PDF Upload Failed: ${err.detail}`);
+                    return false;
+                }
+            } catch (e) {
+                console.error("Upload error:", e);
+                alert("Failed to submit PDF upload to core service.");
+                return false;
+            }
+        }
+
+        // Trigger asynchronous research session
+        async function triggerResearch() {
+            if (isResearching) return;
+            
+            const inputVal = document.getElementById("search-input").value.trim();
+            if (!inputVal) return;
+            
+            isResearching = true;
+            
+            // Clean workspace
+            resetWorkspaceState();
+            
+            document.getElementById("canvas-title").innerText = inputVal;
+            document.getElementById("canvas-standby").classList.add("hidden");
+            document.getElementById("system-status-indicator").innerText = "ANALYZING";
+            document.getElementById("orion-status-msg").innerText = "ORION is booting engines...";
+
+            // 1. Upload file if cached
+            if (pendingFile) {
+                const uploadSuccess = await uploadPendingPDF(currentSessionId);
+                if (!uploadSuccess) {
+                    isResearching = false;
+                    return;
+                }
+            }
+
+            // 2. Open SSE stream beforehand to catch early logs
+            setupSSEStream(currentSessionId);
+
+            // 3. Make POST trigger request
+            try {
+                const response = await fetch(`${API_BASE}/research`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        query: inputVal,
+                        session_id: currentSessionId
+                    })
+                });
+                
+                if (!response.ok) {
+                    const err = await response.json();
+                    document.getElementById("orion-status-msg").innerText = `Vortex connection failed: ${err.detail}`;
+                    isResearching = false;
+                }
+            } catch (e) {
+                console.error("Trigger error:", e);
+                document.getElementById("orion-status-msg").innerText = "Vortex connection error.";
+                isResearching = false;
+            }
+        }
+
+        // Setup Server-Sent Events subscription
+        function setupSSEStream(sessId) {
+            if (eventSource) {
+                eventSource.close();
+            }
+            
+            eventSource = new EventSource(`${API_BASE}/stream/${sessId}`);
+            
+            let sourceIndex = 1;
+            
+            eventSource.onmessage = (event) => {
+                try {
+                    const payload = JSON.parse(event.data);
+                    const evType = payload.event;
+                    const message = payload.message;
+                    const meta = payload.metadata;
+                    
+                    console.log("[SSE Event]", payload);
+
+                    if (isHandlingFollowup) {
+                        if (evType === "status") {
+                            document.getElementById("orion-status-msg").innerText = `ORION: ${message}`;
+                        } else if (evType === "report_section") {
+                            const msgContainer = document.getElementById("followup-messages");
+                            const lastAnswer = msgContainer.querySelector(".followup-answer:last-child");
+                            if (lastAnswer) {
+                                const sec = meta.section;
+                                const content = meta.content;
+                                
+                                if (sec === "summary") {
+                                    const summaryEl = lastAnswer.querySelector(".followup-summary");
+                                    if (summaryEl) summaryEl.innerText = content;
+                                } else if (sec === "findings") {
+                                    const findingsEl = lastAnswer.querySelector(".followup-findings");
+                                    if (findingsEl) {
+                                        findingsEl.classList.remove("hidden");
+                                        findingsEl.innerHTML = "";
+                                        content.forEach(f => {
+                                            const li = document.createElement("li");
+                                            li.className = "mt-1";
+                                            li.innerText = f;
+                                            findingsEl.appendChild(li);
+                                        });
+                                    }
+                                } else if (sec === "perspectives") {
+                                    const perspectivesEl = lastAnswer.querySelector(".followup-perspectives");
+                                    if (perspectivesEl) {
+                                        perspectivesEl.classList.remove("hidden");
+                                        perspectivesEl.innerHTML = "";
+                                        content.forEach(p => {
+                                            const li = document.createElement("li");
+                                            li.className = "mt-1";
+                                            li.innerText = p;
+                                            perspectivesEl.appendChild(li);
+                                        });
+                                    }
+                                } else if (sec === "conclusions") {
+                                    const conclusionsEl = lastAnswer.querySelector(".followup-conclusions");
+                                    if (conclusionsEl) {
+                                        conclusionsEl.classList.remove("hidden");
+                                        conclusionsEl.innerHTML = "";
+                                        content.forEach(c => {
+                                            const li = document.createElement("li");
+                                            li.className = "mt-1";
+                                            li.innerText = c;
+                                            conclusionsEl.appendChild(li);
+                                        });
+                                    }
+                                }
+                                msgContainer.scrollTop = msgContainer.scrollHeight;
+                            }
+                        } else if (evType === "complete") {
+                            document.getElementById("orion-status-msg").innerText = "Intelligence follow-up synthesis complete.";
+                            const loadingEl = document.getElementById("followup-loading");
+                            if (loadingEl) loadingEl.remove();
+                            
+                            // Re-enable inputs
+                            document.getElementById("followup-input").disabled = false;
+                            document.getElementById("followup-send-btn").disabled = false;
+                            document.getElementById("followup-input").focus();
+                            
+                            isHandlingFollowup = false;
+                            isResearching = false;
+                            
+                            if (eventSource) {
+                                eventSource.close();
+                                eventSource = null;
+                            }
+                            
+                            // Register citations interaction
+                            registerCitationsHighlighting();
+                        }
+                        return;
+                    }
+
+                    if (evType === "status") {
+                        // Pulse the indicator and light up ORION lamp
+                        document.getElementById("orion-status-msg").innerText = `ORION: ${message}`;
+                    }
+                    
+                    else if (evType === "source_discovered") {
+                        document.getElementById("workbench-empty").classList.add("hidden");
+                        appendSourceCard(meta, sourceIndex);
+                        document.getElementById("citations-count").innerText = `${sourceIndex} SOURCES DISCOVERED`;
+                        sourceIndex++;
+                    }
+                    
+                    else if (evType === "paper_indexed") {
+                        // Flashes the newly indexed reference inside the sidebar
+                        const card = document.querySelector(`[data-url="${meta.url}"]`);
+                        if (card) {
+                            card.classList.add("neon-glow");
+                            setTimeout(() => card.classList.remove("neon-glow"), 1500);
+                        }
+                    }
+                    
+                    else if (evType === "report_section") {
+                        const sec = meta.section;
+                        const content = meta.content;
+                        
+                        // Dynamically populate matching blocks and make block visible
+                        const sectionElement = document.getElementById(`${sec}-section`);
+                        const blockElement = document.getElementById(`${sec}-block`);
+                        
+                        if (sectionElement && blockElement) {
+                            sectionElement.classList.remove("hidden");
+                            
+                            if (sec === "summary") {
+                                blockElement.innerText = content;
+                            } else if (sec === "findings") {
+                                blockElement.innerHTML = "";
+                                content.forEach(f => {
+                                    const li = document.createElement("li");
+                                    li.className = "flex items-start gap-3 bg-[#1e1917]/50 p-4 rounded-md border border-[#332a26] shadow-sm mt-3";
+                                    li.innerHTML = `
+                                        <span class="material-symbols-outlined text-[#e0aa6c] mt-1 text-xl">auto_awesome</span>
+                                        <div>${f}</div>
+                                    `;
+                                    blockElement.appendChild(li);
+                                });
+                            } else if (sec === "perspectives") {
+                                blockElement.innerHTML = "";
+                                content.forEach(p => {
+                                    const li = document.createElement("li");
+                                    li.className = "bg-[#181311]/30 p-3 border-l-2 border-[#e0aa6c] pl-4 mt-2";
+                                    li.innerText = p;
+                                    blockElement.appendChild(li);
+                                });
+                            } else if (sec === "contradictions") {
+                                if (content && content.length > 0 && content[0] !== "") {
+                                    blockElement.innerText = content.join("\n\n");
+                                } else {
+                                    sectionElement.classList.add("hidden");
+                                }
+                            } else if (sec === "limitations") {
+                                if (content && content.length > 0 && content[0] !== "") {
+                                    blockElement.innerHTML = "";
+                                    content.forEach(l => {
+                                        const li = document.createElement("li");
+                                        li.innerText = l;
+                                        blockElement.appendChild(li);
+                                    });
+                                } else {
+                                    sectionElement.classList.add("hidden");
+                                }
+                            } else if (sec === "conclusions") {
+                                blockElement.innerHTML = "";
+                                content.forEach(c => {
+                                    const li = document.createElement("li");
+                                    li.className = "flex items-start gap-3 bg-[#231b18]/45 p-4 border border-[#332a26] rounded-sm mt-2";
+                                    li.innerHTML = `
+                                        <span class="material-symbols-outlined text-[#e0aa6c] text-[18px] mt-0.5">check_box</span>
+                                        <div>${c}</div>
+                                    `;
+                                    blockElement.appendChild(li);
+                                });
+                            }
+                        }
+                    }
+                    
+                    else if (evType === "evidence_validated") {
+                        document.getElementById("system-status-indicator").innerText = "GROUNDED";
+                        document.getElementById("system-status-indicator").className = "px-2 py-1 bg-green-950 rounded-md text-meta-sm font-label-mono text-green-400 ml-4 border border-green-800/80";
+                    }
+                    
+                    else if (evType === "complete") {
+                        document.getElementById("orion-status-msg").innerText = "Intelligence synthesis complete. Verified by ORION.";
+                        isResearching = false;
+                        
+                        // Show Export buttons and Follow-up panel
+                        document.getElementById("export-md-btn").classList.remove("hidden");
+                        document.getElementById("export-pdf-btn").classList.remove("hidden");
+                        document.getElementById("followup-section").classList.remove("hidden");
+                        
+                        // Parse list structure
+                        const completeMeta = meta;
+                        if (completeMeta.citations) {
+                            completeMeta.citations.forEach(cit => {
+                                citationSourceMap[cit.citation_index] = cit.source_id;
+                            });
+                        }
+                        
+                        // Map references inside paragraphs for interaction
+                        registerCitationsHighlighting();
+                        
+                        // Close channel
+                        eventSource.close();
+                        eventSource = null;
+                        
+                        // Reload history sidebar
+                        loadHistory();
+                    }
+                    
+                } catch (e) {
+                    console.error("SSE stream parsing exception:", e);
+                }
+            };
+            
+            eventSource.onerror = (err) => {
+                console.error("EventSource failed:", err);
+                document.getElementById("orion-status-msg").innerText = "Connection lost. Closed pipeline SSE link.";
+                if (eventSource) {
+                    eventSource.close();
+                    eventSource = null;
+                }
+                isResearching = false;
+            };
+        }
+
+        // Dynamically add a scattered source clipping card in the corkboard workbench
+        function appendSourceCard(src, index) {
+            const container = document.getElementById("workbench-container");
+            
+            const card = document.createElement("div");
+            const srcId = src.id || `src_${index}`;
+            card.setAttribute("data-source-id", srcId);
+            card.setAttribute("data-url", src.url);
+            
+            // Setup source configuration
+            let badgeColor = "text-[#f0d0a8] bg-[#2d1b0f] border-[#f0d0a8]/20";
+            let leftBorderClass = "border-l-4 border-l-[#a08f85]";
+            let sourceIcon = "language";
+            
+            const srcType = (src.source_type || 'web').toLowerCase();
+            if (srcType === "arxiv") {
+                badgeColor = "text-purple-400 bg-purple-950/40 border-purple-800/30";
+                leftBorderClass = "border-l-4 border-l-purple-500";
+                sourceIcon = "school";
+            } else if (srcType === "github") {
+                badgeColor = "text-blue-400 bg-blue-950/40 border-blue-800/30";
+                leftBorderClass = "border-l-4 border-l-blue-500";
+                sourceIcon = "code";
+            } else if (srcType === "wikipedia") {
+                badgeColor = "text-green-400 bg-green-950/40 border-green-800/30";
+                leftBorderClass = "border-l-4 border-l-green-500";
+                sourceIcon = "menu_book";
+            } else if (srcType === "hackernews") {
+                badgeColor = "text-orange-400 bg-orange-950/40 border-orange-800/30";
+                leftBorderClass = "border-l-4 border-l-orange-500";
+                sourceIcon = "forum";
+            } else if (srcType === "rss") {
+                badgeColor = "text-[#ffaa44] bg-[#3d2715]/40 border-[#ffaa44]/25";
+                leftBorderClass = "border-l-4 border-l-[#ffaa44]";
+                sourceIcon = "rss_feed";
+            } else if (srcType === "tavily") {
+                badgeColor = "text-amber-400 bg-amber-950/40 border-amber-800/30";
+                leftBorderClass = "border-l-4 border-l-amber-500";
+                sourceIcon = "language";
+            } else if (srcType === "upload") {
+                badgeColor = "text-[#ff9e7d] bg-[#3a1d12]/60 border-[#ff9e7d]/30";
+                leftBorderClass = "border-l-4 border-l-red-400";
+                sourceIcon = "description";
+            }
+            
+            const urlDomain = src.url ? src.url.replace("https://", "").replace("http://", "").split("/")[0] : "unknown.com";
+            
+            // Visual Trust Meter Score & text description
+            const trustVal = src.trust_score || 0.80;
+            let trustLevel = "VERIFIED";
+            if (trustVal >= 0.95) trustLevel = "EXPERT";
+            else if (trustVal >= 0.85) trustLevel = "AUTHORITATIVE";
+            else if (trustVal >= 0.70) trustLevel = "VERIFIED";
+            else trustLevel = "UNVERIFIED";
+            
+            card.className = `w-full rounded-lg p-5 border cursor-pointer hover:scale-[1.01] flex-shrink-0 transition-all duration-300 shadow-md relative overflow-hidden bg-gradient-to-br from-[#231b18]/90 to-[#181311]/95 border-[#3a2f2a] hover:border-[#ffaa44]/50 hover:shadow-[0_4px_20px_rgba(255,170,68,0.12)] ${leftBorderClass} mt-2`;
+            
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-3 relative z-10">
+                    <span class="font-label-mono text-label-mono ${badgeColor} border px-2 py-0.5 rounded-sm text-[9px] uppercase font-bold flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[11px]">${sourceIcon}</span>
+                        ${src.source_type || 'web'} [${index}]
+                    </span>
+                    <a href="${src.url}" target="_blank" class="material-symbols-outlined text-[#a08f85] hover:text-[#f0d0a8] text-sm transition-colors" onclick="event.stopPropagation()">open_in_new</a>
+                </div>
+                <h3 class="font-headline-md text-body-md font-semibold text-[#ece0d1] mb-2 hover:text-[#ffcc66] transition-colors leading-tight truncate-2-lines">${src.title}</h3>
+                <span class="text-[10px] font-label-mono text-[#a08f85]/70 block truncate mb-2">${urlDomain}</span>
+                
+                <!-- Trust Progress Bar Meter -->
+                <div class="mt-3">
+                    <div class="flex justify-between items-center text-[9px] font-label-mono text-[#a08f85] mb-1">
+                        <span>TRUST METRIC</span>
+                        <span class="text-[#ffcc66] font-bold">${(trustVal * 100).toFixed(0)}% (${trustLevel})</span>
+                    </div>
+                    <div class="w-full bg-[#2d231e] rounded-full h-1 overflow-hidden">
+                        <div class="bg-gradient-to-r from-[#ffaa44] to-[#ffcc66] h-1 rounded-full" style="width: ${trustVal * 100}%"></div>
+                    </div>
+                </div>
+                
+                <!-- Excerpt View Collapsible Control -->
+                <button class="toggle-snippet-btn w-full mt-4 py-1.5 bg-[#231b18]/80 hover:bg-[#332a26] border border-[#ffaa44]/15 hover:border-[#ffaa44]/35 text-[#ffaa44] hover:text-[#ffcc66] rounded text-[10px] font-label-mono uppercase tracking-wider transition-colors flex items-center justify-center gap-1" onclick="event.stopPropagation()">
+                    <span class="material-symbols-outlined text-[12px] transition-transform duration-200">expand_more</span>
+                    <span>View Key Insights</span>
+                </button>
+                <div class="snippet-content hidden mt-3 p-3 bg-[#110d0c] rounded border border-[#332a26]/80 text-[11px] font-label-mono text-[#a08f85]/90 leading-relaxed max-h-40 overflow-y-auto whitespace-pre-wrap select-all" onclick="event.stopPropagation()">
+                    ${src.content || 'No text snippet cached.'}
+                </div>
+            `;
+            
+            // Attach toggle functionality directly to button click inside card
+            const toggleBtn = card.querySelector(".toggle-snippet-btn");
+            const snippetDiv = card.querySelector(".snippet-content");
+            const toggleIcon = toggleBtn.querySelector(".material-symbols-outlined");
+            const toggleText = toggleBtn.querySelector("span:last-child");
+            
+            toggleBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                if (snippetDiv.classList.contains("hidden")) {
+                    snippetDiv.classList.remove("hidden");
+                    toggleIcon.style.transform = "rotate(180deg)";
+                    toggleText.innerText = "Collapse Insights";
+                } else {
+                    snippetDiv.classList.add("hidden");
+                    toggleIcon.style.transform = "rotate(0deg)";
+                    toggleText.innerText = "View Key Insights";
+                }
+            });
+            
+            container.appendChild(card);
+        }
+
+        // Inline citation hover highlight matching source card
+        function registerCitationsHighlighting() {
+            // Find all instances of superscript citation markers or inline tags in findings and summary blocks
+            const article = document.getElementById("canvas-content");
+            if (!article) return;
+            
+            // Wrap plain text citations '[1]' or '[2]' inside clickable inline badges if not already done
+            const textNodes = [];
+            function findTextNodes(node) {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    textNodes.push(node);
+                } else {
+                    for (let child of node.childNodes) {
+                        if (child.nodeName !== "A" && child.nodeName !== "SUP" && child.nodeName !== "BUTTON") {
+                            findTextNodes(child);
+                        }
+                    }
+                }
+            }
+            findTextNodes(article);
+            
+            textNodes.forEach(node => {
+                const text = node.nodeValue;
+                const regex = /\[(\d+)\]/g;
+                if (regex.test(text)) {
+                    const span = document.createElement("span");
+                    span.innerHTML = text.replace(regex, (match, num) => {
+                        return `<sup class="text-[#ff9e7d] font-label-mono text-[10px] mx-0.5 bg-[#2d1b0f] px-1 rounded border border-[#ff9e7d]/30 cursor-pointer hover:bg-[#3f2515] transition-colors citation-badge" data-citation-index="${num}">[${num}]</sup>`;
+                    });
+                    node.parentNode.replaceChild(span, node);
+                }
+            });
+
+            // Add hover/click interactions to all citation badges
+            const badges = document.querySelectorAll(".citation-badge");
+            badges.forEach(badge => {
+                const index = badge.getAttribute("data-citation-index");
+                
+                badge.addEventListener("mouseenter", () => {
+                    // Try to locate target source card in workbench
+                    const card = findCardByIndex(index);
+                    if (card) {
+                        card.classList.add("neon-glow");
+                        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                });
+                
+                badge.addEventListener("mouseleave", () => {
+                    const card = findCardByIndex(index);
+                    if (card) {
+                        card.classList.remove("neon-glow");
+                    }
+                });
+            });
+        }
+
+        function findCardByIndex(index) {
+            // Sources in workbench are rendered with titles containing '[1]', '[2]'...
+            const cards = document.querySelectorAll("[data-source-id]");
+            for (let card of cards) {
+                const badge = card.querySelector(".font-label-mono");
+                if (badge && badge.innerText.includes(`[${index}]`)) {
+                    return card;
+                }
+            }
+            return null;
+        }
+
+        // Sliding Sidebar Collapse Toggle
+        function toggleWorkbench() {
+            const container = document.getElementById("canvas-container");
+            const aside = document.getElementById("workbench-aside");
+            const btn = document.getElementById("toggle-workbench-btn");
+            
+            if (aside.classList.contains("w-2/5")) {
+                aside.classList.remove("w-2/5");
+                aside.classList.add("w-0", "opacity-0", "pointer-events-none");
+                container.classList.remove("w-3/5");
+                container.classList.add("w-full");
+                btn.innerHTML = `<span class="material-symbols-outlined text-sm">side_navigation</span> Show Sidebar`;
+            } else {
+                aside.classList.remove("w-0", "opacity-0", "pointer-events-none");
+                aside.classList.add("w-2/5");
+                container.classList.remove("w-full");
+                container.classList.add("w-3/5");
+                btn.innerHTML = `<span class="material-symbols-outlined text-sm">side_navigation</span> Hide Sidebar`;
+            }
+        }
+
+        // Markdown Exporter 
+        function exportMarkdown() {
+            const title = document.getElementById("canvas-title").innerText;
+            const summary = document.getElementById("summary-block").innerText;
+            
+            let md = `# ${title}\n\n`;
+            md += `## Executive Summary\n${summary}\n\n`;
+            
+            const findings = Array.from(document.querySelectorAll("#findings-block li")).map(li => "- " + li.innerText.replace("auto_awesome", "").trim());
+            if (findings.length > 0) {
+                md += `## Key Findings\n${findings.join("\n")}\n\n`;
+            }
+            
+            const perspectives = Array.from(document.querySelectorAll("#perspectives-block li")).map(li => "- " + li.innerText.trim());
+            if (perspectives.length > 0) {
+                md += `## Perspectives & Contexts\n${perspectives.join("\n")}\n\n`;
+            }
+            
+            const contradictions = document.getElementById("contradictions-block").innerText;
+            if (contradictions && !document.getElementById("contradictions-section").classList.contains("hidden")) {
+                md += `## Contradictions & Conflicts\n${contradictions}\n\n`;
+            }
+            
+            const limitations = Array.from(document.querySelectorAll("#limitations-block li")).map(li => "- " + li.innerText.trim());
+            if (limitations.length > 0 && !document.getElementById("limitations-section").classList.contains("hidden")) {
+                md += `## Limitations & Gaps\n${limitations.join("\n")}\n\n`;
+            }
+            
+            const conclusions = Array.from(document.querySelectorAll("#conclusions-block li")).map(li => "- " + li.innerText.replace("check_box", "").trim());
+            if (conclusions.length > 0) {
+                md += `## Conclusions & Mitigations\n${conclusions.join("\n")}\n\n`;
+            }
+            
+            // Include active follow-ups if any
+            const followups = Array.from(document.querySelectorAll("#followup-messages > div")).map(div => {
+                if (div.classList.contains("followup-answer")) {
+                    const summaryEl = div.querySelector(".followup-summary");
+                    const summary = summaryEl ? summaryEl.innerText : "";
+                    return `**ORION GROUNDED INFERENCE**:\n${summary}\n`;
+                } else {
+                    const qEl = div.querySelector(".text-[#ece0d1]");
+                    const q = qEl ? qEl.innerText : "";
+                    return `**USER INQUIRY**: *${q}*\n`;
+                }
+            });
+            if (followups.length > 0) {
+                md += `## Follow-up Inquiries\n${followups.join("\n")}\n\n`;
+            }
+            
+            const blob = new Blob([md], { type: "text/markdown" });
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = `SourceLens_Intelligence_Report_${currentSessionId}.md`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // Trigger Grounded Follow-up
+        async function triggerFollowup() {
+            if (isResearching || isHandlingFollowup) return;
+            
+            const inputEl = document.getElementById("followup-input");
+            const userQuery = inputEl.value.trim();
+            if (!userQuery) return;
+            
+            isHandlingFollowup = true;
+            isResearching = true;
+            
+            // Disable controls
+            inputEl.disabled = true;
+            document.getElementById("followup-send-btn").disabled = true;
+            
+            // Append user message
+            const msgContainer = document.getElementById("followup-messages");
+            const userCard = document.createElement("div");
+            userCard.className = "flex items-start gap-3 bg-[#1e1917]/40 p-4 rounded border border-[#332a26]/40 mt-3 self-end justify-end";
+            userCard.innerHTML = `
+                <div class="text-right">
+                    <div class="text-[9px] font-label-mono text-[#ffaa44] mb-1">REACTIVE INQUIRY</div>
+                    <div class="text-[#ece0d1] text-xs">${userQuery}</div>
+                </div>
+                <span class="material-symbols-outlined text-[#ffaa44] mt-0.5 text-base">person</span>
+            `;
+            msgContainer.appendChild(userCard);
+            
+            // Append loading placeholder for assistant answer
+            const loadingCard = document.createElement("div");
+            loadingCard.id = "followup-loading";
+            loadingCard.className = "flex items-start gap-3 bg-[#ffaa44]/5 p-4 rounded border border-[#ffaa44]/10 mt-3";
+            loadingCard.innerHTML = `
+                <span class="material-symbols-outlined text-[#ffcc66] mt-0.5 text-base animate-pulse">lightbulb</span>
+                <div>
+                    <div class="text-[9px] font-label-mono text-[#ffcc66] mb-1">ORION LENS SYNTHESIZING...</div>
+                    <div class="text-xs text-[#a08f85] italic flex items-center gap-2">
+                        <span class="material-symbols-outlined text-xs animate-spin">sync</span> Accessing session clippings and re-anchoring evidence...
+                    </div>
+                </div>
+            `;
+            msgContainer.appendChild(loadingCard);
+            
+            // Append response container
+            const responseCard = document.createElement("div");
+            responseCard.className = "followup-answer flex items-start gap-3 bg-[#231b18]/45 p-5 border border-[#332a26] rounded-sm mt-3";
+            responseCard.innerHTML = `
+                <span class="material-symbols-outlined text-[#ffcc66] mt-0.5 text-base">lightbulb</span>
+                <div class="w-full">
+                    <div class="text-[9px] font-label-mono text-[#ffcc66] mb-2 uppercase tracking-wider">ORION GROUNDED INFERENCE</div>
+                    <div class="space-y-3 text-xs text-[#d4c3b3] leading-relaxed">
+                        <div class="followup-summary font-semibold text-[#ece0d1]">...</div>
+                        <ul class="followup-findings space-y-1 list-disc pl-4 text-[11px] opacity-90 hidden"></ul>
+                        <ul class="followup-perspectives space-y-1 list-disc pl-4 text-[11px] opacity-85 hidden"></ul>
+                        <div class="followup-conclusions italic text-[11px] text-[#a08f85] border-t border-[#332a26]/40 pt-2 mt-2 hidden"></div>
+                    </div>
+                </div>
+            `;
+            msgContainer.appendChild(responseCard);
+            
+            msgContainer.scrollTop = msgContainer.scrollHeight;
+            inputEl.value = "";
+            
+            // 1. Establish SSE channel first
+            setupSSEStream(currentSessionId);
+            
+            // 2. Make follow-up POST
+            try {
+                const resp = await fetch(`${API_BASE}/followup`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        query: userQuery,
+                        session_id: currentSessionId
+                    })
+                });
+                
+                if (!resp.ok) {
+                    throw new Error("Failed to queue follow-up.");
+                }
+            } catch (e) {
+                console.error("Followup submission error:", e);
+                const loadEl = document.getElementById("followup-loading");
+                if (loadEl) loadEl.innerHTML = `<span class="text-red-400 text-xs font-label-mono">Failed to initiate follow-up. Please check backend connection.</span>`;
+                inputEl.disabled = false;
+                document.getElementById("followup-send-btn").disabled = false;
+                isHandlingFollowup = false;
+                isResearching = false;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+# ====================================================
+# SourceLens AI — Backend Dependencies
+# ====================================================
+
+# Web Framework
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+
+# Async HTTP client
+httpx>=0.28.1
+
+# Database — async ORM
+sqlalchemy>=2.0.0
+aiosqlite>=0.20.0          # SQLite async driver (dev / fallback)
+asyncpg>=0.29.0            # PostgreSQL async driver (production)
+
+# AI SDK
+google-generativeai>=0.8.5
+
+# PDF Processing
+pymupdf>=1.26.6            # PyMuPDF — fitz
+
+# HTML Parsing & Scraping
+beautifulsoup4>=4.14.2
+lxml>=6.0.0                # Fast XML/HTML parser used by BeautifulSoup
+
+# RSS Feed Ingestion
+feedparser>=6.0.12
+
+# Environment Variables
+python-dotenv>=1.0.0
+
+# Multipart / File Uploads
+python-multipart>=0.0.9
+
+# Optional: Advanced article extraction
+# trafilatura>=1.8.0       # Uncomment for premium boilerplate removal
